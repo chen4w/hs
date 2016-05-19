@@ -87,6 +87,8 @@ gaze([filePath+'*.png',filePath+'*.jpg'], function(err, watcher) {
 */
 
 app.use(express.static(__dirname + '/bower_components'));  
+app.use(express.static(__dirname + '/pics'));
+app.use(express.static(__dirname + '/tpl'));
 app.get('/', function(req, res,next) {  
     res.sendFile(__dirname + '/index.html');
 });
