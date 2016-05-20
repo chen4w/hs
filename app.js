@@ -2,11 +2,32 @@ var express = require('express');
 var app = express();  
 var server = require('http').createServer(app);  
 var io = require('socket.io')(server);
+
+var path = require("path");
+var fs=require('fs');
+var outer = this;
+
 io.on('connection', function(client) {  
     console.log('Client connected...');
-
-    client.on('join', function(data) {
-        console.log(data);
+    var fs =outer.fs;
+    //接受订阅消息,发送初始图片集合
+    client.on('join', function(startPath) {
+        if (!fs.existsSync(startPath)){
+            console.log("no dir ",startPath);
+            return;
+        }
+        var files=fs.readdirSync(startPath);
+        var fs=[];
+        for(var i=0;i<files.length;i++){
+            var f=files[i];
+            var fext = path.extname(f);
+            if(fext=== ".jpg" || fext === ".png") {
+                fs.push(f);
+            }
+        }
+        if(fs.length>0){
+            client.emit('pic_add', fs);
+        }
     });
 
     client.on('messages', function(data) {
@@ -16,8 +37,7 @@ io.on('connection', function(client) {
 
 });
 
-var fs = require('fs');
-var path = require("path");
+
 
 //var filePath = "/Users/chen4w/Documents/hs_pics/";
 var filePath = "**/";
@@ -57,34 +77,7 @@ gaze([filePath+'*.png',filePath+'*.jpg'], function(err, watcher) {
   var files = this.relative();
 });
 
-/*
-    fs.readdir(filePath,function(err,files){
-    if(err){
-        console.log(err);
-        return;
-    }
-    files.forEach(function(filename){
-        //filePath+"/"+filename不能用/直接连接，Unix系统是”/“，Windows系统是”\“
-        var fpath = path.join(filePath,filename);
-        fs.stat(fpath,function(err, stats){
-            if (err) throw err;
-            //文件
-            if(stats.isDirectory()){
-                fs.watch(fpath, {encoding: 'utf8'},function(event, filename) {
-                    var fn = Buffer(filename, 'binary').toString('utf8');
-                    var fp=path.join(fpath,fn);
-                    if (fs.existsSync(fp)) {
-                        console.log(fp+' add.'+event);
-                    }else{
-                        console.log(fp+' remove.');
-                    }
-                });
-                console.log(filename+' watched.');
-            }
-        });        
-    });
-});
-*/
+
 
 app.use(express.static(__dirname + '/bower_components'));  
 app.use(express.static(__dirname + '/pics'));

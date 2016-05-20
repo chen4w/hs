@@ -13,6 +13,9 @@
 		<link rel="stylesheet" type="text/css" href="css/demo.css" />
 		<link rel="stylesheet" type="text/css" href="css/component.css" />
 		<script src="js/modernizr.min.js"></script>
+		<script src="js/jquery-1.10.2.js"></script>
+        <script src="/socket.io/socket.io.js"></script>            
+
 	</head>
 	<body>
 		<div class="container">
@@ -139,6 +142,15 @@
 		<script src="js/photostack.js"></script>
 		<script>
 			// [].slice.call( document.querySelectorAll( '.photostack' ) ).forEach( function( el ) { new Photostack( el ); } );
+			var socket = io.connect('http://localhost:4200');
+			//订阅图片目录
+			socket.on('connect', function(data) {
+				socket.emit('join', 'pics/upload');
+			});
+			socket.on('pic_add', function(data) {
+				console.log(data);
+			});
+			
 			
 			new Photostack( document.getElementById( 'photostack-3' ), {
 				//showNavigation:false,
