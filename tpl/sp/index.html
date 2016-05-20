@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
 		<meta name="viewport" content="width=device-width, initial-scale=1"> 
-		<title>Scattered Polaroids Gallery</title>
+		<title>留言墙</title>
 		<meta name="description" content="Scattered Polaroids Gallery: A flat-style take on a Polaroid gallery" />
 		<meta name="keywords" content="scattered polaroids, image gallery, javascript, random rotation, 3d, backface, flat design" />
 		<meta name="author" content="Codrops" />
@@ -72,13 +72,13 @@
 							</div>
 						</figcaption>
 					</figure>
-					<figure data-dummy>
+					<figure >
 						<a href="#" class="photostack-img"><img src="img/7.jpg" alt="img07"/></a>
 						<figcaption>
 							<h2 class="photostack-title">Lovely Green</h2>
 						</figcaption>
 					</figure>
-					<figure data-dummy>
+					<figure >
 						<a href="#" class="photostack-img"><img src="img/8.jpg" alt="img08"/></a>
 						<figcaption>
 							<h2 class="photostack-title">Wonderful</h2>
@@ -141,8 +141,9 @@
 			// [].slice.call( document.querySelectorAll( '.photostack' ) ).forEach( function( el ) { new Photostack( el ); } );
 			
 			new Photostack( document.getElementById( 'photostack-3' ), {
+				//showNavigation:false,
 				callback : function( item ) {
-					//console.log(item)
+					console.log(item)
 				}
 			} );
 		</script>

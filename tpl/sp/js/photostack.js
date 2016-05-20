@@ -96,6 +96,7 @@
   	extend( this.options, options );
  		// index of the current photo
 		this.current = this.options.start;
+		this.maxItemCount = this.options.maxItem || 20;
   	this._init();
 		var ps = this;
 
@@ -120,6 +121,36 @@
 		afterShowPhoto: null,
 		afterNavigate: null,
 	};
+		//c4w add photo,
+	Photostack.prototype._addPhoto= function(pics){
+			for(var i=0; i<pics.length; i++){
+				var fg = document.createElement( 'figure' );
+				var img = document.createElement( 'img' );
+				img.src = pics[i];
+				fg.appendChild(img);
+				this.inner.appendChild(fg);
+			}
+			//if overflow limit, remove the top pics
+			var overCount = this.allItemsCount+pics.length- this.maxItemCount;
+			for(var i=0; i<overCount; i++){
+				this.inner.removeChild(this.inner.children[0]);
+			}
+			var me=this;
+			setTimeout( function(){
+				me.allItems = [].slice.call( me.inner.children );
+				me.allItemsCount = me.allItems.length;
+				me.items = [].slice.call( me.inner.querySelectorAll( 'figure:not([data-dummy])' ) );
+				me.itemsCount = me.items.length;
+				//this.current = this.itemsCount-1;
+				if(me.options.showNavigation) {
+					me._addNavigation();
+					me._initEvents();
+				}
+				//me.isShuffling = false;
+				me._showPhoto(me.itemsCount-1);
+			}, 25 );
+			
+		},
 
 	Photostack.prototype._init = function() {
 		this.currentItem = this.items[ this.current ];
@@ -135,6 +166,10 @@
 
 	Photostack.prototype._addNavigation = function() {
 		// add nav dots
+		//c4w for call again
+		if(this.nav){
+			this.el.removeChild(this.nav);
+		}
 		this.nav = document.createElement( 'nav' )
 		var inner = '';
 		for( var i = 0; i < this.itemsCount; ++i ) {
@@ -184,6 +219,8 @@
 			this.navDots.forEach( function( dot, idx ) {
 				dot.addEventListener( 'click', function() {
 					// rotate the photo if clicking on the current dot
+					self._addPhoto(['img/15.jpg']);
+					if(1==1) return;
 					if( idx === self.current ) {
 						self._rotateItem();
 					}
@@ -229,6 +266,7 @@
 
 	Photostack.prototype._showPhoto = function( pos ) {
 		if( this.isShuffling ) {
+			console.log('not isShuffling');
 			return false;
 		}
 		this.isShuffling = true;
@@ -261,7 +299,7 @@
 
 		// shuffle a bit
 		this._shuffle();
-
+		console.log('this._shuffle()');
 		if(this.options.afterShowPhoto) {
 			this.options.afterShowPhoto(this);
 		}
@@ -344,6 +382,7 @@
 							if( support.transitions ) {
 								this.removeEventListener( transEndEventName, onEndTransitionFn );
 							}
+							console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
 							if( cntItemsAnim === self.allItemsCount ) {
 								if( iter > 0 ) {
 									moveItems.call();
@@ -375,7 +414,7 @@
 						item.style.msTransform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 						item.style.transform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 					}
-
+					console.log('i:'+i);
 					if( self.started ) {
 						if( support.transitions ) {
 							item.addEventListener( transEndEventName, onEndTransitionFn );
