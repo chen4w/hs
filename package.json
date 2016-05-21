@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/chen4w/hs#readme",
   "dependencies": {
+    "async": "^2.0.0-rc.5",
     "express": "^4.13.4",
     "gaze": "^1.0.0",
     "socket.io": "^1.4.6"

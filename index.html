@@ -1,7 +1,7 @@
 <!doctype html>  
 <html lang="en">  
     <head>
-         <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+         <script src="sp/js/jquery-1.10.2.js"></script>
         <script src="/socket.io/socket.io.js"></script>            
 
     </head>
@@ -16,11 +16,12 @@
 <script>  
  var socket = io.connect('http://localhost:4200');
  socket.on('connect', function(data) {
-    socket.emit('join', 'Hello World from client');
+    socket.emit('join', 'pics/upload');
  });
- socket.on('broad', function(data) {
-         $('#future').html(data);
-   });
+ socket.on('added', function(data) {
+    //$('#future').html(data);
+    console.log(data);
+ });
 
  $('form').submit(function(e){
      e.preventDefault();

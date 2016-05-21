@@ -89,7 +89,8 @@
 		this.inner = this.el.querySelector( 'div' );
 		this.allItems = [].slice.call( this.inner.children );
 		this.allItemsCount = this.allItems.length;
-		if( !this.allItemsCount ) return;
+		//c4w
+		//if( !this.allItemsCount ) return;
 		this.items = [].slice.call( this.inner.querySelectorAll( 'figure:not([data-dummy])' ) );
 		this.itemsCount = this.items.length;
 		this.options = extend( {}, this.options );
@@ -102,6 +103,9 @@
 
   	// Public methods.
   	return {
+		addPhoto:function(pics){
+			ps._addPhoto.call(ps,pics);
+		},
   		showPhoto: function(idx) {
   			ps._showPhoto.call(ps, idx);
   		},
@@ -141,12 +145,8 @@
 				me.allItemsCount = me.allItems.length;
 				me.items = [].slice.call( me.inner.querySelectorAll( 'figure:not([data-dummy])' ) );
 				me.itemsCount = me.items.length;
-				//this.current = this.itemsCount-1;
-				if(me.options.showNavigation) {
-					me._addNavigation();
-					me._initEvents();
-				}
-				//me.isShuffling = false;
+				
+				me._init();
 				me._showPhoto(me.itemsCount-1);
 			}, 25 );
 			
@@ -154,6 +154,10 @@
 
 	Photostack.prototype._init = function() {
 		this.currentItem = this.items[ this.current ];
+		//c4w
+		if(!this.currentItem){
+			return;
+		}
 		if(this.options.showNavigation) {
 			this._addNavigation();
 		}
@@ -219,8 +223,8 @@
 			this.navDots.forEach( function( dot, idx ) {
 				dot.addEventListener( 'click', function() {
 					// rotate the photo if clicking on the current dot
-					self._addPhoto(['img/15.jpg']);
-					if(1==1) return;
+					//self._addPhoto(['img/15.jpg']);
+					//if(1==1) return;
 					if( idx === self.current ) {
 						self._rotateItem();
 					}
@@ -299,7 +303,7 @@
 
 		// shuffle a bit
 		this._shuffle();
-		console.log('this._shuffle()');
+		//console.log('this._shuffle()');
 		if(this.options.afterShowPhoto) {
 			this.options.afterShowPhoto(this);
 		}
@@ -382,7 +386,7 @@
 							if( support.transitions ) {
 								this.removeEventListener( transEndEventName, onEndTransitionFn );
 							}
-							console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
+							//console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
 							if( cntItemsAnim === self.allItemsCount ) {
 								if( iter > 0 ) {
 									moveItems.call();
@@ -414,7 +418,7 @@
 						item.style.msTransform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 						item.style.transform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 					}
-					console.log('i:'+i);
+					//console.log('i:'+i);
 					if( self.started ) {
 						if( support.transitions ) {
 							item.addEventListener( transEndEventName, onEndTransitionFn );
