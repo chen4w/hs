@@ -97,7 +97,7 @@
   	extend( this.options, options );
  		// index of the current photo
 		this.current = this.options.start;
-		this.maxItemCount = this.options.maxItem || 20;
+		this.maxItemCount = this.options.maxItem || 10;
   	this._init();
 		var ps = this;
 
@@ -143,10 +143,11 @@
 			setTimeout( function(){
 				me.allItems = [].slice.call( me.inner.children );
 				me.allItemsCount = me.allItems.length;
-				me.items = [].slice.call( me.inner.querySelectorAll( 'figure:not([data-dummy])' ) );
+				me.items = [].slice.call( me.inner.querySelectorAll( 'figure' ) );
 				me.itemsCount = me.items.length;
 				
 				me._init();
+				//me._resizeHandler();
 				me._showPhoto(me.itemsCount-1);
 			}, 25 );
 			
@@ -271,7 +272,7 @@
 	Photostack.prototype._showPhoto = function( pos ) {
 		if( this.isShuffling ) {
 			console.log('not isShuffling');
-			return false;
+			//return false;
 		}
 		this.isShuffling = true;
 
@@ -386,7 +387,7 @@
 							if( support.transitions ) {
 								this.removeEventListener( transEndEventName, onEndTransitionFn );
 							}
-							//console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
+							console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
 							if( cntItemsAnim === self.allItemsCount ) {
 								if( iter > 0 ) {
 									moveItems.call();
@@ -418,7 +419,7 @@
 						item.style.msTransform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 						item.style.transform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 					}
-					//console.log('i:'+i);
+					console.log('i:'+i);
 					if( self.started ) {
 						if( support.transitions ) {
 							item.addEventListener( transEndEventName, onEndTransitionFn );
