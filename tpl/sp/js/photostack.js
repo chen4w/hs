@@ -85,6 +85,7 @@
 	}
 
 	function Photostack( el, options ) {
+		this.pics =[];
 		this.el = el;
 		this.inner = this.el.querySelector( 'div' );
 		this.allItems = [].slice.call( this.inner.children );
@@ -103,6 +104,9 @@
 
   	// Public methods.
   	return {
+		pushPics:function(pics){
+			ps._pushPics(pics);	
+		},
 		addPhoto:function(pics){
 			ps._addPhoto.call(ps,pics);
 		},
@@ -125,37 +129,56 @@
 		afterShowPhoto: null,
 		afterNavigate: null,
 	};
+	//c4w cache pics
+	Photostack.prototype._pushPics= function(pics){
+		for(var i=0; i<pics.length; i++){
+			this.pics.push(pics[i]);
+		}
+		if(!this.isShuffling){
+			console.log('_pushPics & _addPhoto');
+			this._addPhoto();
+		}else{
+			console.log('_pushPics');
+		}
+	};
 		//c4w add photo,
-	Photostack.prototype._addPhoto= function(pics){
-			for(var i=0; i<pics.length; i++){
-				var fg = document.createElement( 'figure' );
-				var img = document.createElement( 'img' );
-				img.src = pics[i];
-				fg.appendChild(img);
-				this.inner.appendChild(fg);
-			}
-			//if overflow limit, remove the top pics
-			var overCount = this.allItemsCount+pics.length- this.maxItemCount;
-			for(var i=0; i<overCount; i++){
-				this.inner.removeChild(this.inner.children[0]);
-			}
-			var me=this;
-			setTimeout( function(){
-				me.allItems = [].slice.call( me.inner.children );
-				me.allItemsCount = me.allItems.length;
-				me.items = [].slice.call( me.inner.querySelectorAll( 'figure' ) );
-				me.itemsCount = me.items.length;
-				
-				me._init();
-				//me._resizeHandler();
-				me._showPhoto(me.itemsCount-1);
-			}, 25 );
+	Photostack.prototype._addPhoto= function(){
+		var pics = this.pics;
+		var len_pic = pics.length;
+		if(!len_pic){
+			return;
+		}	
+		this.isShuffling = true;	
+		for(var i=0; i<len_pic; i++){
+			var fg = document.createElement( 'figure' );
+			var img = document.createElement( 'img' );
+			img.src = pics.shift();
+			fg.appendChild(img);
+			this.inner.appendChild(fg);
+		}
+		//if overflow limit, remove the top pics
+		var overCount = this.allItemsCount+len_pic- this.maxItemCount;
+		for(var i=0; i<overCount; i++){
+			this.inner.removeChild(this.inner.children[0]);
+		}
+		var me=this;
+		setTimeout( function(){
+			me.allItems = [].slice.call( me.inner.children );
+			me.allItemsCount = me.allItems.length;
+			me.items = [].slice.call( me.inner.querySelectorAll( 'figure' ) );
+			me.itemsCount = me.items.length;
 			
-		},
+			me._init();
+			//me._resizeHandler();
+			me._showPhoto(me.itemsCount-1);
+		}, 25 );
+		
+	},
 
 	Photostack.prototype._init = function() {
 		this.currentItem = this.items[ this.current ];
 		//c4w
+		//console.log('current:'+this.current);
 		if(!this.currentItem){
 			return;
 		}
@@ -271,10 +294,9 @@
 
 	Photostack.prototype._showPhoto = function( pos ) {
 		if( this.isShuffling ) {
-			console.log('not isShuffling');
+			//console.log('not isShuffling');
 			//return false;
 		}
-		this.isShuffling = true;
 
 		// if there is something behind..
 		if( classie.hasClass( this.currentItem, 'photostack-flip' ) ) {
@@ -387,7 +409,7 @@
 							if( support.transitions ) {
 								this.removeEventListener( transEndEventName, onEndTransitionFn );
 							}
-							console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
+							//console.log('cntItemsAnim:'+cntItemsAnim +' /'+self.allItemsCount);
 							if( cntItemsAnim === self.allItemsCount ) {
 								if( iter > 0 ) {
 									moveItems.call();
@@ -400,6 +422,9 @@
 									if( typeof self.options.callback === 'function' ) {
 										self.options.callback( self.currentItem );
 									}
+									setTimeout(function(){
+										self._addPhoto();
+									},25);
 								}
 							}
 						};
@@ -419,7 +444,7 @@
 						item.style.msTransform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 						item.style.transform = 'translate(' + translation.x + 'px,' + translation.y + 'px) rotate(' + Math.floor( Math.random() * (maxrot - minrot + 1) + minrot ) + 'deg)';
 					}
-					console.log('i:'+i);
+					//console.log('i:'+i);
 					if( self.started ) {
 						if( support.transitions ) {
 							item.addEventListener( transEndEventName, onEndTransitionFn );
