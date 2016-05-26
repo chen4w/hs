@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge"> 
 		<meta name="viewport" content="width=device-width, initial-scale=1"> 
-		<title>留言墙</title>
+		<title>留言墙－Stack</title>
 		<meta name="description" content="Scattered Polaroids Gallery: A flat-style take on a Polaroid gallery" />
 		<meta name="keywords" content="scattered polaroids, image gallery, javascript, random rotation, 3d, backface, flat design" />
 		<meta name="author" content="Codrops" />
@@ -28,14 +28,19 @@
 		<script src="js/photostack.js"></script>
 		<script>
 			// [].slice.call( document.querySelectorAll( '.photostack' ) ).forEach( function( el ) { new Photostack( el ); } );
-			var socket = io.connect('http://localhost:4200');
+			var socket = io.connect(location.host);
 			//订阅图片目录
 			socket.on('connect', function(data) {
 				socket.emit('join', '/upload');
 			});
 			socket.on('added', function(data) {
-				console.log(data);
-				ps.pushPics(data);
+				var pics=[];
+				for(var i=0; i<data.length; i++){
+					if(data[i].indexOf('/upload')==0)
+						pics.push(data[i]);
+				}
+				if(pics.length>0)
+					ps.pushPics(pics);
 			});
 			
 			

@@ -1,11 +1,8 @@
 var sno = 1000;
-makeBoxes = function() {
-  var boxes = [],
-      count = Math.random()*10;
-      if (count < 1) count = 1;
-  //if there isn't remark, insert one.
+var pics_cache=[];
+makeRemarkBox=function(boxes){
   var box_remark = $('#container').find('.box.size22');
-  console.log(box_remark);
+  //console.log(box_remark);
   if(!box_remark.length){
      var box = document.createElement('div');
      box.className = 'box size22'; 
@@ -17,24 +14,55 @@ makeBoxes = function() {
      img.src =  '/wifi.png';
      img.style.width="100px";
      box.appendChild(img);
-     boxes.push( box );
+     boxes.push(box);
  }
+}
+makeBoxesByData=function(pics){
+    var boxes = [];
+    makeRemarkBox(boxes);
+    var blen = $('#container').find('.box.size24').length;
+    for(var i=0; i<pics.length; i++){
+       var box = document.createElement('div');
+        if(blen<3){
+          box.className = 'box size24';   
+          blen++; 
+        }else{
+          box.className = 'box size12'; 
+        }
+
+       var img = document.createElement('img');
+       img.src =  pics[i];
+      img.style="width:100%";
+      box.appendChild(img);
+      boxes.push(box);
+    }
+    return boxes;
+}
+
+makeBoxes = function(cout) {
+  if(!cout)
+    cout=1;
+  if(pics_cache.length==0)
+    return;
+  var len = Math.min(cout,pics_cache.length);
+  var boxes = [];
+  //if there isn't remark, insert one.
+  makeRemarkBox(boxes);
+  var blen = $('#container').find('.box.size24').length;
   
-  for (var i=0; i < count; i++ ) {
+  for (var i=0; i < len; i++ ) {
     var box = document.createElement('div');
-    var rs = Math.ceil(Math.random()*8);
     var img = document.createElement('img');
-   if(rs==1){
-     box.className = 'box size24';    
+    if(blen<3){
+      box.className = 'box size24';   
+      blen++; 
     }else{
       box.className = 'box size12'; 
     }
-     img.src =  '/upload/m'+rs+'.png';
-     img.style="width:100%";
-     box.appendChild(img);
-   // add box DOM node to array of new elements
-    sno++;
-    //box.innerHTML=sno;
+     
+    img.src =  pics_cache.shift();
+    img.style="width:100%";
+    box.appendChild(img);
     boxes.push( box );
   }
 

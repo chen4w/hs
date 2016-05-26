@@ -98,7 +98,7 @@
   	extend( this.options, options );
  		// index of the current photo
 		this.current = this.options.start;
-		this.maxItemCount = this.options.maxItem || 10;
+		this.maxItemCount = this.options.maxItem || 20;
   	this._init();
 		var ps = this;
 
@@ -153,6 +153,7 @@
 			var fg = document.createElement( 'figure' );
 			var img = document.createElement( 'img' );
 			img.src = pics.shift();
+			img.style="width:240px;"
 			fg.appendChild(img);
 			this.inner.appendChild(fg);
 		}
