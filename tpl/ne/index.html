@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Nested</title>
+<link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+<script src="js/jquery-1.10.2.js"></script>
+<script src="jquery.nested.js"></script>
+<script src="makeboxes.js"></script>
+</head>
+<body>
+
+<a class="btn" id="prepend">Prepend</a>
+
+<div id="container">
+  <div class="box size12">1</div>
+  <div class="box size12">2</div>
+  <div class="box size24">3</div>
+  <div class="box size22">4</div>
+  <div class="box size12">5</div>
+  <div class="box size12">6</div>
+  <div class="box size12">7</div>
+  <div class="box size12">8</div>
+  <div class="box size12">9</div>
+  <div class="box size12">10</div>
+</div>
+
+<a class="btn" id="append">Append</a>
+
+<script type="text/javascript" >
+  
+  $(function() { 
+   
+    $('#container').nested({
+      minWidth: 150,
+      resizeToFit: false,
+      gutter: 10,
+  animate: true,
+  animationOptions: {
+    speed: 10,
+    duration: 20,
+    complete: function(p1,p2){
+      console.log('ani end.');
+      //remove boxes outside screen.
+      //$('#container').removeOutItems();
+      setTimeout(function(){
+        var mt =  screen.availHeight;
+        var ers =[];
+        $.each(p1, function (index, value) {
+             var top = $(value['$el']).position().top;
+             if(top>mt){
+              console.log(index+':'+top+':'+mt);
+              //ers.push(value);
+              $(value['$el']).remove();
+             }
+         });
+         if(ers.length>0){
+            //$('#container',ers).remove();
+         }
+      },25);
+      
+    }
+  }
+    }); 
+    
+    $('#prepend').click(function(){
+      var boxes = makeBoxes();
+      $('#container').prepend(boxes).nested('prepend',boxes);
+    })
+    $('#append').click(function(){
+      var boxes = makeBoxes();
+      $('#container').append(boxes).nested('append',boxes);     
+    })
+
+  });
+  
+  
+</script>
+  
+</body>
+</html>    
