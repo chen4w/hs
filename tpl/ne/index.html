@@ -9,9 +9,9 @@
 <script src="makeboxes.js"></script>
 <script src="/socket.io/socket.io.js"></script>            
 </head>
-<body>
+<body style="overflow:hidden;">
 
-<a class="btn" id="prepend">next</a>
+<a class="btn" id="prepend" style="display:none;">next</a>
 <div id="container">
 </div>
 
@@ -29,9 +29,10 @@
   <div class="box size12">10</div>
 </div>
 
-<a class="btn" id="append">Append</a>
+<a class="btn" id="append" style="display:none;">Append</a>
 
 <script type="text/javascript" >
+   var b_ss, timer_ss, timer_play;
   
   $(function() { 
    var w=window.innerWidth|| document.documentElement.clientWidth|| document.body.clientWidth;
@@ -58,12 +59,28 @@
               //|| (top>0 && el.hasClass('size24'))
               ){
                var src = el.children('img').attr('src');
+               //排除remark img
                if(src.indexOf('/upload')==0)
                   pics_cache.push(src);
                el.remove();
              }
          });
           $('#prepend').text('next');
+          //一段时间无新pic,触发屏保模式
+          if(!timer_ss){
+            timer_ss = setTimeout(function(){
+              timer_play = setTimeout(function(){
+                var boxes = makeBoxes(3);
+                $('#container').prepend(boxes).nested('prepend',boxes);                
+              },50);
+            },10000);
+          }
+          if(timer_play){
+               timer_play = setTimeout(function(){
+                var boxes = makeBoxes(3);
+                $('#container').prepend(boxes).nested('prepend',boxes);                
+              },5000);
+          }
       },225);
       
     }
@@ -101,6 +118,15 @@
       }
       if(pics.length==0)
         return false;
+      //清除屏保模式计时
+      if(timer_ss){
+         clearTimeout(timer_ss);
+         timer_ss=null;
+      }
+      if(timer_play){
+         clearTimeout(timer_play);
+         timer_play=null;
+      }
       $('#prepend').text('waiting...');
       var boxes = makeBoxesByData(pics);
       $('#container').prepend(boxes).nested('prepend',boxes);
