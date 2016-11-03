@@ -6,9 +6,9 @@ makeRemarkBox=function(boxes){
   if(!box_remark.length){
      var box = document.createElement('div');
      box.className = 'box size22'; 
-     box.style="padding:30px;background:none;line-height:30px;";
+     box.style="padding:0px;background:none;line-height:30px;";
      var p = document.createElement('p');
-     p.innerHTML="<h1>认领您的作品，就在 'www.bhere.cn'</h1>";
+     p.innerHTML="<h1>认领您的作品，<br/>去 www.bhere.cn</h1>";
      box.appendChild(p);
     var img = document.createElement('img');
      img.src =  '/pics/wifi.png';
