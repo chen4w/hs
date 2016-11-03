@@ -57,7 +57,7 @@ async.auto({
         io.fs = fs;
         
         io.on('connection', function(client) {  
-            console.log('Client connected...');
+            console.log('Client ['+client.handshake.address+'] connected.');
             //接受订阅消息,发送初始图片集合
             client.on('join', function(sp) {
                 var fs = this.server.fs;
