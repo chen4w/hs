@@ -4,6 +4,7 @@ var async = require('async');
 var settings = require('./settings.js');
 const uri_pics ='/pics';
 const port = 4200;
+const root_len= settings.pic_root.length;
 
 async.auto({  
     config: function(cb){
@@ -18,24 +19,32 @@ async.auto({
 
         var io = scope.network.io;
         // Watch all .js files/dirs in process.cwd()
-        gaze([filePath+'*.png',filePath+'*.jpg'], function(err, watcher) {
+        gaze([filePath+'*.png',filePath+'*.jpg'], 
+         {cwd: settings.pic_root}, 
+        function(err, watcher) {
             // Files have all started watching
             // Get all watched files
             var watched = this.watched();
 
             // On file changed
-            this.on('changed', function(filepath) {
+            this.on('changed', function(fp) {
                 console.log(filepath + ' was changed');
+                 io.emit('added',[uri_pics+fp.substring(root_len)]);
             });
 
+            // On file changed
+            this.on('renamed', function(fp) {
+                console.log(fp + ' was renamed');
+                 io.emit('added',[uri_pics+fp.substring(root_len)]);
+            });
             // On file added
             this.on('added', function(fp) {
-                io.emit('added',[fp.substring(settings.pic_root.length)]);
+                io.emit('added',[uri_pics+fp.substring(root_len)]);
             });
 
             // On file deleted
-            this.on('deleted', function(filepath) {
-                io.emit('deleted',[fp.substring(settings.pic_root.length)])
+            this.on('deleted', function(fp) {
+                io.emit('deleted',[uri_pics+fp.substring(root_len)])
             });
 
             // On changed/added/deleted
