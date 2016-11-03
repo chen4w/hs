@@ -1,9 +1,13 @@
 
 var path = require("path");
 var async = require('async');
+var settings = require('./settings.js');
+const uri_pics ='/pics';
+const port = 4200;
 
 async.auto({  
     config: function(cb){
+        console.log('pics root:'+settings.pic_root);
         cb(null,{
             watchPath:'**/'
         });
@@ -26,14 +30,12 @@ async.auto({
 
             // On file added
             this.on('added', function(fp) {
-                var pos = fp.lastIndexOf('pics/');
-                io.emit('added',[fp.substring(pos+4)]);
+                io.emit('added',[fp.substring(settings.pic_root.length)]);
             });
 
             // On file deleted
             this.on('deleted', function(filepath) {
-                var inf = filepath + ' was deleted';
-                io.emit('deleted',inf)
+                io.emit('deleted',[fp.substring(settings.pic_root.length)])
             });
 
             // On changed/added/deleted
@@ -59,7 +61,8 @@ async.auto({
             //接受订阅消息,发送初始图片集合
             client.on('join', function(sp) {
                 var fs = this.server.fs;
-                var startPath='pics'+sp;
+                var startPath=settings.pic_root+sp;
+                
                 if (!fs.existsSync(startPath)){
                     console.log("no dir ",startPath);
                     return;
@@ -69,8 +72,8 @@ async.auto({
                 for(var i=0;i<files.length;i++){
                     var f=files[i];
                     var fext = path.extname(f);
-                    if(fext=== ".jpg" || fext === ".png") {
-                        fs.push(sp+'/'+f);
+                    if(fext=== ".jpg" || fext === ".png"  || fext === ".jpeg") {
+                        fs.push(uri_pics+sp+'/'+f);
                     }
                 }
                 if(fs.length>0){
@@ -97,13 +100,15 @@ async.auto({
         var app = scope.network.app;
         var express = scope.network.express;
         app.use(express.static(__dirname + '/bower_components'));  
-        app.use(express.static(__dirname + '/pics'));
+        //app.use(express.static(__dirname + '/pics'));
+        app.use(uri_pics,express.static(settings.pic_root));
         app.use(express.static(__dirname + '/tpl'));
         app.get('/', function(req, res,next) {  
             res.sendFile(__dirname + '/index.html');
         });
         //listen
-        scope.network.server.listen(4200);            
+        scope.network.server.listen(port);     
+        console.log('server is ready on port '+port +'.')       
     }] 
     },function (err, result) {
 		if (err) {

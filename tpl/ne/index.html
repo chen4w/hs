@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>留言墙－MoMa</title>
+<title>留言墙－BHere</title>
 <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
 <script src="js/jquery-1.10.2.js"></script>
 <script src="jquery.nested.js"></script>
@@ -32,7 +32,11 @@
 <a class="btn" id="append" style="display:none;">Append</a>
 
 <script type="text/javascript" >
-   var b_ss, timer_ss, timer_play;
+  var path_wallpaper='/wallpaper';
+  var path_upload='/upload/p';
+  var uri_pics = '/pics';
+   
+  var b_ss, timer_ss, timer_play;
   
   $(function() { 
    var w=window.innerWidth|| document.documentElement.clientWidth|| document.body.clientWidth;
@@ -60,7 +64,8 @@
               ){
                var src = el.children('img').attr('src');
                //排除remark img
-               if(src.indexOf('/upload')==0)
+               if(src.indexOf(uri_pics+path_wallpaper)==0 
+               || src.indexOf(uri_pics+path_upload)==0)
                   pics_cache.push(src);
                el.remove();
              }
@@ -105,12 +110,13 @@
     var socket = io.connect(location.host);
     //订阅图片目录
     socket.on('connect', function(data) {
-      socket.emit('join', '/upload');
+      socket.emit('join', path_wallpaper);
     });
     socket.on('added', function(data) {
       var pics=[];
       for(var i=0; i<data.length; i++){
-        if(data[i].indexOf('/upload')==0){
+        if(data[i].indexOf(uri_pics+path_wallpaper)==0 
+        || data[i].indexOf(uri_pics+path_upload)==0){
           pics.push(data[i]);
         }else{
           console.log(data[i]);

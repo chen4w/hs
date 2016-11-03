@@ -8,10 +8,10 @@ makeRemarkBox=function(boxes){
      box.className = 'box size22'; 
      box.style="padding:30px;background:none;line-height:30px;";
      var p = document.createElement('p');
-     p.innerHTML="<h1>Find your card, share it and browse many more at 'www.moma.com/iwent'</h1>";
+     p.innerHTML="<h1>认领您的作品，就在 'www.bhere.cn'</h1>";
      box.appendChild(p);
     var img = document.createElement('img');
-     img.src =  '/wifi.png';
+     img.src =  '/pics/wifi.png';
      img.style.width="100px";
      box.appendChild(img);
      boxes.push(box);
