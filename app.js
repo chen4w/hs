@@ -34,16 +34,25 @@ async.auto({
 
             // On file changed
             this.on('renamed', function(fp) {
-                console.log(fp + ' was renamed');
                  if(path.sep=='\\')
                     fp = fp.replace(/\\/g,'/');
-                io.emit('added',[uri_pics+fp.substring(root_len)]);
+                if(settings.delay){
+                    setTimeout(function(){
+                        io.emit('added',[uri_pics+fp.substring(root_len)]);
+                    }, settings.delay);
+                }else
+                    io.emit('added',[uri_pics+fp.substring(root_len)]);                
             });
             // On file added
             this.on('added', function(fp) {
                 if(path.sep=='\\')
                     fp = fp.replace(/\\/g,'/');
-                io.emit('added',[uri_pics+fp.substring(root_len)]);
+                if(settings.delay){
+                    setTimeout(function(){
+                        io.emit('added',[uri_pics+fp.substring(root_len)]);
+                    }, settings.delay);
+                }else
+                    io.emit('added',[uri_pics+fp.substring(root_len)]);                
             });
 
             // On file deleted
