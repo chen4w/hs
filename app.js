@@ -35,16 +35,22 @@ async.auto({
             // On file changed
             this.on('renamed', function(fp) {
                 console.log(fp + ' was renamed');
-                 io.emit('added',[uri_pics+fp.substring(root_len)]);
+                 if(path.sep=='\\')
+                    fp = fp.replace(/\\/g,'/');
+                io.emit('added',[uri_pics+fp.substring(root_len)]);
             });
             // On file added
             this.on('added', function(fp) {
+                if(path.sep=='\\')
+                    fp = fp.replace(/\\/g,'/');
                 io.emit('added',[uri_pics+fp.substring(root_len)]);
             });
 
             // On file deleted
             this.on('deleted', function(fp) {
-                io.emit('deleted',[uri_pics+fp.substring(root_len)])
+              if(path.sep=='\\')
+                fp = fp.replace(/\\/g,'/');
+               io.emit('deleted',[uri_pics+fp.substring(root_len)])
             });
 
             // On changed/added/deleted
@@ -68,25 +74,28 @@ async.auto({
         io.on('connection', function(client) {  
             console.log('Client ['+client.handshake.address+'] connected.');
             //接受订阅消息,发送初始图片集合
-            client.on('join', function(sp) {
+            client.on('join', function(sps) {
                 var fs = this.server.fs;
-                var startPath=settings.pic_root+sp;
+                var result=[];
+                for(var i=0; i<sps.length; i++){
+                    var sp = sps[i];
+                    var startPath=settings.pic_root+sp;                    
+                    if (!fs.existsSync(startPath)){
+                        console.log("no dir ",startPath);
+                        return;
+                    }
+                    var files=fs.readdirSync(startPath);
                 
-                if (!fs.existsSync(startPath)){
-                    console.log("no dir ",startPath);
-                    return;
-                }
-                var files=fs.readdirSync(startPath);
-                var fs=[];
-                for(var i=0;i<files.length;i++){
-                    var f=files[i];
-                    var fext = path.extname(f);
-                    if(fext=== ".jpg" || fext === ".png"  || fext === ".jpeg") {
-                        fs.push(uri_pics+sp+'/'+f);
+                    for(var i=0;i<files.length;i++){
+                        var f=files[i];
+                        var fext = path.extname(f);
+                        if(fext=== ".jpg" || fext === ".png"  || fext === ".jpeg") {
+                            result.push(uri_pics+sp+'/'+f);
+                        }
                     }
                 }
-                if(fs.length>0){
-                    client.emit('added', fs);
+                if(result.length>0){
+                    client.emit('added',result);
                 }
             });
 

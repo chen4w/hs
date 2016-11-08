@@ -1,32 +1,145 @@
-<!doctype html>  
-<html lang="en">  
-    <head>
-         <script src="sp/js/jquery-1.10.2.js"></script>
-        <script src="/socket.io/socket.io.js"></script>            
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>留言墙－BHere</title>
+<link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+<script src="js/jquery-1.10.2.js"></script>
+<script src="jquery.nested.js"></script>
+<script src="makeboxes.js"></script>
+<script src="/socket.io/socket.io.js"></script>            
+</head>
+<body style="overflow:hidden;">
 
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-        <div id="future"></div>
-        <form id="form" id="chat_form">
-            <input id="chat_input" type="text">
-            <input type="submit" value="Send">
-        </form>
-    </body>
-<script>  
- var socket = io.connect('http://localhost:4200');
- socket.on('connect', function(data) {
-    socket.emit('join', 'pics/upload');
- });
- socket.on('added', function(data) {
-    //$('#future').html(data);
-    console.log(data);
- });
+<a class="btn" id="prepend" style="display:none;">next</a>
+<div id="container">
+</div>
 
- $('form').submit(function(e){
-     e.preventDefault();
-     var message = $('#chat_input').val();
-     socket.emit('messages', message);
- });
+
+<div id="container11" style="display:none;">
+  <div class="box size12">1</div>
+  <div class="box size12">2</div>
+  <div class="box size24">3</div>
+  <div class="box size22">4</div>
+  <div class="box size12">5</div>
+  <div class="box size12">6</div>
+  <div class="box size12">7</div>
+  <div class="box size12">8</div>
+  <div class="box size12">9</div>
+  <div class="box size12">10</div>
+</div>
+
+<a class="btn" id="append" style="display:none;">Append</a>
+
+<script type="text/javascript" >
+  var path_wallpaper='/wallpaper';
+  var path_upload='/upload/p';
+  var uri_pics = '/pics';
+   
+  var b_ss, timer_ss, timer_play;
+  
+  $(function() { 
+   var w=window.innerWidth|| document.documentElement.clientWidth|| document.body.clientWidth;
+   
+    $('#container').nested({
+      minWidth: w / 7,
+      resizeToFit: false,
+      gutter: 10,
+  animate: true,
+  animationOptions: {   
+    queue: true,
+    speed: 100,
+    duration: 100,
+    complete: function(p1,p2){
+      //remove boxes and cache img outside screen.
+      //$('#container').removeOutItems();
+      setTimeout(function(){
+        var mt =window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
+        $.each(p1, function (index, value) {
+             var el = $(value['$el']);
+             var top = el.position().top;
+             //移除视窗之外的条，避免出现半拉子条
+             if(top>mt 
+              //|| (top>0 && el.hasClass('size24'))
+              ){
+               var src = el.children('img').attr('src');
+               //排除remark img
+               if(src.indexOf(uri_pics+path_wallpaper)==0 
+               || src.indexOf(uri_pics+path_upload)==0)
+                  pics_cache.push(src);
+               el.remove();
+             }
+         });
+          $('#prepend').text('next');
+          //一段时间无新pic,触发屏保模式
+          if(!timer_ss){
+            timer_ss = setTimeout(function(){
+              timer_play = setTimeout(function(){
+                var boxes = makeBoxes(3);
+                $('#container').prepend(boxes).nested('prepend',boxes);                
+              },50);
+            },10000);
+          }
+          if(timer_play){
+               timer_play = setTimeout(function(){
+                var boxes = makeBoxes(3);
+                $('#container').prepend(boxes).nested('prepend',boxes);                
+              },5000);
+          }
+      },225);
+      
+    }
+  }
+    }); 
+    
+    $('#prepend').click(function(){
+      if($('#prepend').text().indexOf('...')!=-1)
+        return false;
+      $('#prepend').text('waiting...');
+      var boxes = makeBoxes(3);
+      $('#container').prepend(boxes).nested('prepend',boxes);
+    })
+    $('#append').click(function(){
+      var boxes = makeBoxes();
+      $('#container').append(boxes).nested('append',boxes);     
+    })
+
+  });
+
+
+    var socket = io.connect(location.host);
+    //订阅图片目录
+    socket.on('connect', function(data) {
+      socket.emit('join', [path_wallpaper,path_upload]);
+    });
+    socket.on('added', function(data) {
+      console.log('added:'+data);
+      var pics=[];
+      for(var i=0; i<data.length; i++){
+        if(data[i].indexOf(uri_pics+path_wallpaper)==0 
+        || data[i].indexOf(uri_pics+path_upload)==0){
+          pics.push(data[i]);
+        }else{
+          console.log(data[i]);
+        }
+      }
+      if(pics.length==0)
+        return false;
+      //清除屏保模式计时
+      if(timer_ss){
+         clearTimeout(timer_ss);
+         timer_ss=null;
+      }
+      if(timer_play){
+         clearTimeout(timer_play);
+         timer_play=null;
+      }
+      $('#prepend').text('waiting...');
+      var boxes = makeBoxesByData(pics);
+      $('#container').prepend(boxes).nested('prepend',boxes);
+    });
+			  
 </script>
-</html>  
+  
+</body>
+</html>    
