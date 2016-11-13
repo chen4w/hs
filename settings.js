@@ -2,7 +2,7 @@ var path = require("path");
 
 class Setting {
   constructor() {
-     this.delay=1000;
+     this.delay=0;
       if(path.sep=='/')
         this.pic_root = "/Users/c4w/git/pics";
       else

@@ -1,8 +1,9 @@
 var sno = 1000;
 var pics_cache=[];
 makeRemarkBox=function(boxes){
+  //当前屏幕墙是否存在size22的特殊说明图
   var box_remark = $('#container').find('.box.size22');
-  //console.log(box_remark);
+  //如果已经有,不动作,否则加入一张说明
   if(!box_remark.length){
      var box = document.createElement('div');
      box.className = 'box size22'; 
@@ -38,7 +39,7 @@ makeBoxesByData=function(pics){
     }
     return boxes;
 }
-
+//cout 挤入图片数量
 makeBoxes = function(cout) {
   if(!cout)
     cout=1;
@@ -53,6 +54,7 @@ makeBoxes = function(cout) {
   for (var i=0; i < len; i++ ) {
     var box = document.createElement('div');
     var img = document.createElement('img');
+    //如果当前屏幕墙少于3张大图,产生一张大图
     if(blen<3){
       box.className = 'box size24';   
       blen++; 

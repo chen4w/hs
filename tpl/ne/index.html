@@ -15,7 +15,7 @@
 <div id="container">
 </div>
 
-
+<!-- 屏幕墙初始布局 -->
 <div id="container11" style="display:none;">
   <div class="box size12">1</div>
   <div class="box size12">2</div>
@@ -32,6 +32,10 @@
 <a class="btn" id="append" style="display:none;">Append</a>
 
 <script type="text/javascript" >
+//启动屏保模式时长,默认10s
+  var span_sceensave = 10000;
+//两次动画之间停留时间,默认5s
+  var span_stay = 5000;
   var path_wallpaper='/wallpaper';
   var path_upload='/upload/p';
   var uri_pics = '/pics';
@@ -78,13 +82,13 @@
                 var boxes = makeBoxes(3);
                 $('#container').prepend(boxes).nested('prepend',boxes);                
               },50);
-            },10000);
+            },span_sceensave);
           }
           if(timer_play){
                timer_play = setTimeout(function(){
                 var boxes = makeBoxes(3);
                 $('#container').prepend(boxes).nested('prepend',boxes);                
-              },5000);
+              },span_stay);
           }
       },225);
       
@@ -110,7 +114,7 @@
     var socket = io.connect(location.host);
     //订阅图片目录
     socket.on('connect', function(data) {
-      socket.emit('join', path_wallpaper);
+      socket.emit('join', [path_wallpaper,path_upload]);
     });
     socket.on('added', function(data) {
       console.log('added:'+data);
