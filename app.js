@@ -15,61 +15,35 @@ async.auto({
     },
     file:['config','network', function (scope,cb) {  
         var filePath = scope.config.watchPath;
-        var gaze = require('gaze');
-
         var io = scope.network.io;
-        // Watch all .js files/dirs in process.cwd()
-        gaze([filePath+'*.png',filePath+'*.jpg'], 
-         {cwd: settings.pic_root}, 
-        function(err, watcher) {
-            // Files have all started watching
-            // Get all watched files
-            var watched = this.watched();
 
-            // On file changed
-            this.on('changed', function(fp) {
-                console.log(filepath + ' was changed');
-                 io.emit('added',[uri_pics+fp.substring(root_len)]);
-            });
-
-            // On file changed
-            this.on('renamed', function(fp) {
-                 if(path.sep=='\\')
-                    fp = fp.replace(/\\/g,'/');
-                if(settings.delay){
-                    setTimeout(function(){
-                        io.emit('added',[uri_pics+fp.substring(root_len)]);
-                    }, settings.delay);
-                }else
-                    io.emit('added',[uri_pics+fp.substring(root_len)]);                
-            });
-            // On file added
-            this.on('added', function(fp) {
-                if(path.sep=='\\')
-                    fp = fp.replace(/\\/g,'/');
-                if(settings.delay){
-                    setTimeout(function(){
-                        io.emit('added',[uri_pics+fp.substring(root_len)]);
-                    }, settings.delay);
-                }else
-                    io.emit('added',[uri_pics+fp.substring(root_len)]);                
-            });
-
-            // On file deleted
-            this.on('deleted', function(fp) {
-              if(path.sep=='\\')
-                fp = fp.replace(/\\/g,'/');
-               io.emit('deleted',[uri_pics+fp.substring(root_len)])
-            });
-
-            // On changed/added/deleted
-            this.on('all', function(event, filepath) {
-                var inf = filepath + ' was ' + event;
-                console.log(inf);
-                io.emit('all',inf)
-            });
-        });        
-        cb(null, gaze);  
+        var chokidar = require('chokidar');
+        var watcher = chokidar.watch(['**/*.jpg','**/*.png'],{
+            ignored: /[\/\\]\./,
+            cwd:settings.pic_root,
+            ignoreInitial: true,
+            awaitWriteFinish: {
+                stabilityThreshold: settings.stabilityThreshold,
+                pollInterval: 100
+            }
+        });   
+        watcher
+        .on('add', fp => {
+            if(path.sep=='\\')
+                fp = fp.replace(/\\/g,'/');            
+            io.emit('added',[uri_pics+'/'+fp]);
+        })
+        .on('change', fp => {
+            if(path.sep=='\\')
+                fp = fp.replace(/\\/g,'/');            
+            io.emit('added',[uri_pics+'/'+fp]);
+        })
+        .on('unlink', fp => {
+            if(path.sep=='\\')
+                fp = fp.replace(/\\/g,'/');            
+            io.emit('deleted',[uri_pics+'/'+fp]);
+        });
+     
     }],  
   
     network: function (cb) {  
