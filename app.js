@@ -4,7 +4,7 @@ const fs=require('fs');
 
 const async = require('async');
 const settings = require('./settings.js');
-const uri_pics ='/pics';
+const uri_pics =settings.uri_pics;
 const port = 4200;
 const root_len= settings.pic_root.length;
 
@@ -89,6 +89,31 @@ function cachePath(fpath){
   });
 }
 
+function getTbPath(fp){
+    let p0 = fp.lastIndexOf(path.sep);
+    if(p0!=-1){
+        return settings.pic_root + path.sep+ fp.substring(0,p0+1)+path_tbn+fp.substring(p0+1);
+    }else{
+        return settings.pic_root + path.sep + path_tbn + fp;
+    }
+}
+
+function onEvent(fp,io,bAdd){
+    let fpath = getTbPath(fp);
+    let furi = uri_pics+fpath.substring(root_len);
+    if(path.sep=='\\')
+        furi = furi.replace(/\\/g,'/');   
+    if(bAdd){
+        //先缓存再推送消息
+        cacheFile(fpath,function(data){
+            console.log(furi);
+            io.emit('added',[furi]);
+        });
+    }else{
+         io.emit('deleted',[furi]);
+    }      
+}
+
 async.auto({  
     config: function(cb){
         console.log('pics root:'+settings.pic_root);
@@ -112,19 +137,13 @@ async.auto({
         });   
         watcher
         .on('add', fp => {
-            if(path.sep=='\\')
-                fp = fp.replace(/\\/g,'/');            
-            io.emit('added',[uri_pics+'/'+path_tbn+fp]);
+            onEvent(fp,io,true);
         })
         .on('change', fp => {
-            if(path.sep=='\\')
-                fp = fp.replace(/\\/g,'/');            
-            io.emit('added',[uri_pics+'/'+path_tbn+fp]);
+             onEvent(fp,io,true);
         })
         .on('unlink', fp => {
-            if(path.sep=='\\')
-                fp = fp.replace(/\\/g,'/');            
-            io.emit('deleted',[uri_pics+'/'+path_tbn+fp]);
+            onEvent(fp,io,false);
         });
      
     }],  
@@ -203,6 +222,7 @@ async.auto({
                 res.writeHead(200, {'Content-Type': 'image'});
                 res.write(data);
                 res.end();
+                //console.log('hit cache:'+ fpath)
                 return;      
             }
             cacheFile(fpath,function(data){
