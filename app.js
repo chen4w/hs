@@ -13,6 +13,7 @@ const NodeCache = require( "node-cache" );
 //缓存失效时间设置为1天, 每小时检查一次,不使用clone
 const fsCache = new NodeCache({ stdTTL: 24*3600, checkperiod: 3600, useClones:false });
 const path_tbn = settings.thumbnails_uri + settings.thumbnails_size+path.sep;
+const prefixWH = 'PWH-';
 
 //cache原始图或抽点图,tbn_len=0:原始图, tbn_len>0 抽点图 
 function cacheFile(fpath,func) {
@@ -53,7 +54,13 @@ function cacheFile(fpath,func) {
       buf_src = fs.readFileSync(fpath_src);
       fsCache.set(fpath_src,buf_src);
     }
-    gm(buf_src).resize(tbn_len).toBuffer(
+    gm(buf_src).size(function (err, size) {
+        if (!err){
+            //缓存图片的宽高,推送前端用
+            fsCache.set(prefixWH+fpath_src,size);
+            console.log('pic size:'+fpath+'\n w:'+size.width +'  h:'+size.height);
+        }
+    }).resize(tbn_len).toBuffer(
       path.extname(fpath_src),
       function(err, buf) {
         if (err){
@@ -107,7 +114,11 @@ function onEvent(fp,io,bAdd){
         //先缓存再推送消息
         cacheFile(fpath,function(data){
             console.log(furi);
-            io.emit('added',[furi]);
+            let s = fsCache.get(prefixWH+settings.pic_root+path.sep+fp);
+            io.emit('added',[{
+                furl:furi,
+                fsize:s
+            }]);
         });
     }else{
          io.emit('deleted',[furi]);
@@ -175,7 +186,12 @@ async.auto({
                         var fext = path.extname(f);
                         if(fext=== ".jpg" || fext === ".png"  || fext === ".jpeg") {
                             //发送抽点图
-                            result.push(uri_pics+sp+'/'+path_tbn+ f);
+                            let whp =prefixWH+ startPath + path.sep + f;
+                            let s = fsCache.get(whp);
+                            result.push({
+                                furl:uri_pics+sp+'/'+path_tbn+ f,
+                                fsize:s
+                            });
                         }
                     }
                 }

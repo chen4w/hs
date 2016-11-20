@@ -32,7 +32,9 @@ makeBoxesByData=function(pics){
         }
 
        var img = document.createElement('img');
-       img.src =  pics[i];
+       var pic = pics[i];
+       img.src =  pic.furl;
+       console.log(pic.fsize.width + ':'+pic.fsize.height);
       img.style="width:100%";
       box.appendChild(img);
       boxes.push(box);

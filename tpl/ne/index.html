@@ -117,14 +117,15 @@
       socket.emit('join', [path_wallpaper,path_upload]);
     });
     socket.on('added', function(data) {
-      console.log('added:'+data);
+      //console.log('added:'+data);
       var pics=[];
       for(var i=0; i<data.length; i++){
-        if(data[i].indexOf(uri_pics+path_wallpaper)==0 
-        || data[i].indexOf(uri_pics+path_upload)==0){
+        var furl = data[i].furl;
+        if(furl.indexOf(uri_pics+path_wallpaper)==0 
+        || furl.indexOf(uri_pics+path_upload)==0){
           pics.push(data[i]);
         }else{
-          console.log(data[i]);
+          console.log(furl);
         }
       }
       if(pics.length==0)
