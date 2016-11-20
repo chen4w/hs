@@ -46,7 +46,8 @@
    var w=window.innerWidth|| document.documentElement.clientWidth|| document.body.clientWidth;
    
     $('#container').nested({
-      minWidth: w / 7,
+      //需要减去gutter间距
+      minWidth: (w-70) / 7,
       resizeToFit: false,
       gutter: 10,
   animate: true,
@@ -66,11 +67,12 @@
              if(top>mt 
               //|| (top>0 && el.hasClass('size24'))
               ){
-               var src = el.children('img').attr('src');
+               var el_img = el.children('img');
+               var src = el_img.attr('src');
                //排除remark img
                if(src.indexOf(uri_pics+path_wallpaper)==0 
                || src.indexOf(uri_pics+path_upload)==0)
-                  pics_cache.push(src);
+                  pics_cache.push(el_img[0].pic);
                el.remove();
              }
          });
