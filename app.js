@@ -58,7 +58,7 @@ function cacheFile(fpath,func) {
         if (!err){
             //缓存图片的宽高,推送前端用
             fsCache.set(prefixWH+fpath_src,size);
-            console.log('pic size:'+fpath+'\n w:'+size.width +'  h:'+size.height);
+            //console.log('pic size:'+fpath+'\n w:'+size.width +'  h:'+size.height);
         }
     }).resize(tbn_len).toBuffer(
       path.extname(fpath_src),
@@ -84,12 +84,11 @@ function cachePath(fpath){
  try {
     fs.accessSync(fpath, fs.F_OK);
     // Do something
-} catch (e) {
+ } catch (e) {
     // It isn't accessible
     console.log('cache path fail:'+fpath);
     return;
-}
-
+ }
   //列出目录下所有文件
   let ls = fs.readdirSync(fpath).filter(function(file) {
       let en = path.extname(file);
@@ -99,11 +98,11 @@ function cachePath(fpath){
       else
         return false;
   });
-  console.log('caching '+ls.length+' pics from:'+ fpath);
   ls.forEach(function (item, index, array) {
     let fn = fpath+ path.sep + path_tbn + item;
     cacheFile(fn);
   });
+  console.log('cached '+ls.length+' pics from:'+ fpath);
 }
 
 function getTbPath(fp){
