@@ -80,6 +80,16 @@ function cacheFile(fpath,func) {
 
 //缓存目录下所有图片,预先生成抽点
 function cachePath(fpath){
+    //目录是否存在
+ try {
+    fs.accessSync(fpath, fs.F_OK);
+    // Do something
+} catch (e) {
+    // It isn't accessible
+    console.log('cache path fail:'+fpath);
+    return;
+}
+
   //列出目录下所有文件
   let ls = fs.readdirSync(fpath).filter(function(file) {
       let en = path.extname(file);
@@ -226,7 +236,7 @@ async.auto({
         });
 
         //cache pic files
-        cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'n');
+        cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'p');
         cachePath(settings.pic_root+ path.sep + settings.pic_wallpaper);
         //app.use(uri_pics,express.static(settings.pic_root));
         app.use(uri_pics,(req, res) => {
