@@ -62,6 +62,18 @@ makeBoxesByData=function(pics){
           span.setAttribute("style","color:#FF0000; font-size: 30pt; position: absolute; top: 50px; left: 50px;");
           span.textContent = box.className.substring(8);
           box.appendChild(span);
+          $(box).click(function(e){
+            if(span_ani){
+              console.log('stop on click');
+              span_ani = 0;
+              clearTimeout(timer_play);
+              clearTimeout(timer_ss);
+            }else{
+              console.log('resume on click');
+              span_ani = 225;
+              nextFrame();
+            }
+          });
         }     
        var img = document.createElement('img');
        img.src =  pic.furl;
@@ -101,6 +113,18 @@ makeBoxes = function(cout) {
       span.setAttribute("style","color:#FF0000; font-size: 30pt; position: absolute; top: 50px; left: 50px;");
       span.textContent = box.className.substring(8);
       box.appendChild(span);
+      $(box).click(function(e){
+        if(span_ani){
+          console.log('stop on click');
+          span_ani = 0;
+          clearTimeout(timer_play);
+          clearTimeout(timer_ss);
+        }else{
+          console.log('resume on click');
+          span_ani = 225;
+          nextFrame();
+        }
+      });
     }     
     img.src= pic.furl;
     img.pic = pic;

@@ -33,8 +33,8 @@ body {	background-color:gray;
 			
 #container { background: gray;}
 
-.size21, .size22, .size23, .twocols { background: cadetblue }
-.size31, .size32, .size33, .threecols { background: chocolate }
+/*.size21, .size22, .size23, .twocols { background: cadetblue }
+.size31, .size32, .size33, .threecols { background: chocolate }*/
 
 a.btn {
   margin-right: 1px;

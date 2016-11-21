@@ -33,15 +33,60 @@
 
 <script type="text/javascript" >
 //启动屏保模式时长,默认10s
-  var span_sceensave = 10000;
+  var span_sceensave = 1000;
 //两次动画之间停留时间,默认5s
-  var span_stay = 5000;
+  var span_stay = 2000;
+  var span_ani = 225;
   var path_wallpaper='/wallpaper';
   var path_upload='/upload/p';
   var uri_pics = '/pics';
    
   var b_ss, timer_ss, timer_play;
-  
+  var pp1;
+function nextFrame(p1){
+  if(!span_ani)
+    return;
+  if(p1)
+    pp1 = p1;
+  else
+    p1 = pp1;
+    setTimeout(function(){
+      var mt =window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
+      $.each(p1, function (index, value) {
+            var el = $(value['$el']);
+            var top = el.position().top;
+            //移除视窗之外的条，避免出现半拉子条
+            if(top>mt 
+            //|| (top>0 && el.hasClass('size24'))
+            ){
+              var el_img = el.children('img');
+              var src = el_img.attr('src');
+              //排除remark img
+              if(src.indexOf(uri_pics+path_wallpaper)==0 
+              || src.indexOf(uri_pics+path_upload)==0)
+                pics_cache.push(el_img[0].pic);
+              el.remove();
+            }
+        });
+        $('#prepend').text('next');
+        //一段时间无新pic,触发屏保模式
+        if(!timer_ss && span_sceensave){
+          timer_ss = setTimeout(function(){
+            timer_play = setTimeout(function(){
+              var boxes = makeBoxes(3);
+              $('#container').prepend(boxes).nested('prepend',boxes);                
+            },50);
+          },span_sceensave);
+        }
+        if(timer_play){
+              timer_play = setTimeout(function(){
+              var boxes = makeBoxes(3);
+              $('#container').prepend(boxes).nested('prepend',boxes);                
+            },span_stay);
+        }
+    },span_ani);  
+}
+
   $(function() { 
    var w=window.innerWidth|| document.documentElement.clientWidth|| document.body.clientWidth;
    
@@ -58,42 +103,7 @@
     complete: function(p1,p2){
       //remove boxes and cache img outside screen.
       //$('#container').removeOutItems();
-      setTimeout(function(){
-        var mt =window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
-        $.each(p1, function (index, value) {
-             var el = $(value['$el']);
-             var top = el.position().top;
-             //移除视窗之外的条，避免出现半拉子条
-             if(top>mt 
-              //|| (top>0 && el.hasClass('size24'))
-              ){
-               var el_img = el.children('img');
-               var src = el_img.attr('src');
-               //排除remark img
-               if(src.indexOf(uri_pics+path_wallpaper)==0 
-               || src.indexOf(uri_pics+path_upload)==0)
-                  pics_cache.push(el_img[0].pic);
-               el.remove();
-             }
-         });
-          $('#prepend').text('next');
-          //一段时间无新pic,触发屏保模式
-          if(!timer_ss){
-            timer_ss = setTimeout(function(){
-              timer_play = setTimeout(function(){
-                var boxes = makeBoxes(3);
-                $('#container').prepend(boxes).nested('prepend',boxes);                
-              },50);
-            },span_sceensave);
-          }
-          if(timer_play){
-               timer_play = setTimeout(function(){
-                var boxes = makeBoxes(3);
-                $('#container').prepend(boxes).nested('prepend',boxes);                
-              },span_stay);
-          }
-      },225);
-      
+      nextFrame(p1);
     }
   }
     }); 
