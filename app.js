@@ -16,9 +16,20 @@ const fsCache = new NodeCache({ stdTTL: 24*3600, checkperiod: 3600, useClones:fa
 const path_tbn = settings.thumbnails_uri + settings.thumbnails_size+path.sep;
 const prefixWH = 'PWH-';
 
+function archiveTask(){
+    var schedule = require('node-schedule');
+    var rule = new schedule.RecurrenceRule();  
+    rule.minute = 42;
+    var j = schedule.scheduleJob(settings.cron_archive, function(){  
+        console.log('----archive check---');
+        archive(function(){
+            console.log('----archive check end---');           
+        })
+    });
+}
 
 //检查是否存在昨天目录,如果没有，生成昨天的目录，并将upload/p /n 移动到该目录下
-function archive(){
+function archive(func){
     let dt = new Date(); // Today!
     dt.setDate(dt.getDate() - 1); // Yesterday!
     let path_yesterday = path.join(settings.pic_root,
@@ -29,8 +40,10 @@ function archive(){
     //console.log(path_yesterday);
     fs.stat(path_yesterday, function(err, stat) {
         //目录已经存在
-        if(stat&&stat.isDirectory()) 
-            return;
+        if(stat&&stat.isDirectory()){
+            console.log('archive folder:'+ path_yesterday+' exists.');
+            return func();
+        } 
         //移动upload/p upload/n
         let path_src = path.join(
             settings.pic_root,
@@ -39,17 +52,18 @@ function archive(){
             path.join(path_yesterday,'p'), {mkdirp: true}, function(err) {
             if(err){ 
                 console.log(err);
-                return;
+                return func();
             }
+            mv(path.join(path_src,'n'), 
+                path.join(path_yesterday,'n'), {mkdirp: true}, function(err) {
+                if(err){ 
+                    console.log(err);
+                    return func();
+                }
+                console.log('moved folder from: '+path_src+' to:'+path_yesterday);   
+                func();        
+            }); 
         });            
-        mv(path.join(path_src,'n'), 
-            path.join(path_yesterday,'n'), {mkdirp: true}, function(err) {
-            if(err){ 
-                console.log(err);
-                return;
-            }
-        }); 
-        console.log('moved folder from: '+path_src+' to:'+path_yesterday);           
     });
 }
 
@@ -272,11 +286,18 @@ async.auto({
             res.sendFile(__dirname + '/index.html');
         });
 
-        //对以前的工作归档处理
-        archive();
-        //cache pic files
-        cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'p');
-        cachePath(settings.pic_root+ path.sep + settings.pic_wallpaper);
+        //对以前的工作归档处理,归档完成再进行缓存
+        console.log('---archive check-----');
+        archive(function(){
+            //cache pic files
+            console.log('---cache path-----');
+            cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'p');
+            cachePath(settings.pic_root+ path.sep + settings.pic_wallpaper);
+            archiveTask();
+        });
+        //启动周期性归档任务
+
+
         //app.use(uri_pics,express.static(settings.pic_root));
         app.use(uri_pics,(req, res) => {
             let fp =  settings.pic_root + req.url.replace(/\//g,path.sep);
