@@ -235,7 +235,8 @@ async.auto({
                 var result=[];
                 for(var i=0; i<sps.length; i++){
                     var sp = sps[i];
-                    var startPath=settings.pic_root+sp;                    
+                    //for win replace with path.sep
+                    var startPath=settings.pic_root+sp.replace(/\//g,path.sep);                                   
                     if (!fs.existsSync(startPath)){
                         console.log("no dir ",startPath);
                         return;
