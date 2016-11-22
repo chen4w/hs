@@ -1,6 +1,7 @@
 
 const path = require("path");
 const fs=require('fs');
+const mv = require('mv');
 
 const async = require('async');
 const settings = require('./settings.js');
@@ -14,6 +15,43 @@ const NodeCache = require( "node-cache" );
 const fsCache = new NodeCache({ stdTTL: 24*3600, checkperiod: 3600, useClones:false });
 const path_tbn = settings.thumbnails_uri + settings.thumbnails_size+path.sep;
 const prefixWH = 'PWH-';
+
+
+//检查是否存在昨天目录,如果没有，生成昨天的目录，并将upload/p /n 移动到该目录下
+function archive(){
+    let dt = new Date(); // Today!
+    dt.setDate(dt.getDate() - 1); // Yesterday!
+    let path_yesterday = path.join(settings.pic_root,
+        settings.pic_archive,
+        dt.getFullYear().toString(),
+        (dt.getMonth()+1).toString(),
+        dt.getDate().toString());
+    //console.log(path_yesterday);
+    fs.stat(path_yesterday, function(err, stat) {
+        //目录已经存在
+        if(stat&&stat.isDirectory()) 
+            return;
+        //移动upload/p upload/n
+        let path_src = path.join(
+            settings.pic_root,
+            settings.pic_upload);
+        mv(path.join(path_src,'p'),
+            path.join(path_yesterday,'p'), {mkdirp: true}, function(err) {
+            if(err){ 
+                console.log(err);
+                return;
+            }
+        });            
+        mv(path.join(path_src,'n'), 
+            path.join(path_yesterday,'n'), {mkdirp: true}, function(err) {
+            if(err){ 
+                console.log(err);
+                return;
+            }
+        }); 
+        console.log('moved folder from: '+path_src+' to:'+path_yesterday);           
+    });
+}
 
 //cache原始图或抽点图,tbn_len=0:原始图, tbn_len>0 抽点图 
 function cacheFile(fpath,func) {
@@ -234,6 +272,8 @@ async.auto({
             res.sendFile(__dirname + '/index.html');
         });
 
+        //对以前的工作归档处理
+        archive();
         //cache pic files
         cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'p');
         cachePath(settings.pic_root+ path.sep + settings.pic_wallpaper);
