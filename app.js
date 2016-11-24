@@ -113,12 +113,14 @@ function cacheFile(fpath,func) {
             //缓存图片的宽高,推送前端用
             fsCache.set(prefixWH+fpath_src,size);
             //console.log('pic size:'+fpath+'\n w:'+size.width +'  h:'+size.height);
+        }else{
+            console.log('gm err:'+err);
         }
     }).resize(tbn_len).toBuffer(
       path.extname(fpath_src),
       function(err, buf) {
         if (err){
-          console.log(err);
+          console.log('gm err:'+err);
           if(func){
             func(null);
           }
