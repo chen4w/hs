@@ -53,18 +53,9 @@ function archive(func){
             if(err){ 
                 //无须告警
                 //console.log(err);
-                return func();
             }
-            mv(path.join(path_src,'n'), 
-                path.join(path_yesterday,'n'), {mkdirp: true}, function(err) {
-                if(err){ 
-                    //无须告警
-                   // console.log(err);
-                    return func();
-                }
-                console.log('moved folder from: '+path_src+' to:'+path_yesterday);   
-                func();        
-            }); 
+            func();
+            //未通过的不用归档,避免share到公网
         });            
     });
 }

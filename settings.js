@@ -1,7 +1,13 @@
 var path = require("path");
+var crypto = require('crypto');
+var fs = require('fs');
 
 class Setting {
   constructor() {
+    this.version='2016.12';
+    //必须是唯一的名称,将其hash值作为云端唯一标识
+    this.sn = '杭州工艺美术博物馆';
+    
     this.thumbnails_size=450; //抽点宽度
     this.thumbnails_uri ='tbnails'; //抽点目录标志
     this.uri_pics ='/pics';   //图片uri起始
@@ -15,6 +21,11 @@ class Setting {
         this.pic_root = "/Users/c4w/git/pics";
       else
         this.pic_root = "c:\\pics";
+    //calc md5 of sn
+    //this.sn_md5 = '81949faebfe3c5ff42bcbd5c06a06511';
+    this.sn_md5 = crypto.createHash('md5').update(this.sn).digest("hex");
+    console.log('sn:'+this.sn+' md5:'+this.sn_md5);
   }
 }
+
 module.exports =  (new Setting);
