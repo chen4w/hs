@@ -48,11 +48,10 @@ function archive(func){
         let path_src = path.join(
             settings.pic_root,
             settings.pic_upload);
-        mv(path.join(path_src,'p'),
-            path.join(path_yesterday,'p'), {mkdirp: true}, function(err) {
-            if(err){ 
+        mv(path.join(path_src,'p'),path_yesterday, {mkdirp: true}, function(err) {
+            if(!err){ 
                 //无须告警
-                //console.log(err);
+                console.log('move pics from:'+path_src+' to:'+path_yesterday);
             }
             func();
             //未通过的不用归档,避免share到公网
