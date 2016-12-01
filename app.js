@@ -150,6 +150,9 @@ function cachePath(fpath,cb){
  } catch (e) {
     // It isn't accessible
     console.log('cache path fail:'+fpath);
+    if(cb){
+        cb();
+    }
     return;
  }
   //列出目录下所有文件
