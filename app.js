@@ -59,8 +59,25 @@ function archive(func){
     });
 }
 
-//cache原始图或抽点图,tbn_len=0:原始图, tbn_len>0 抽点图 
 function cacheFile(fpath,func) {
+  //击中缓存，无需延时
+  let data =  fsCache.get(fpath);
+  if(data){
+    if(func){
+      func(data);
+    }
+    return;
+  }
+  if(settings.cacheSpan){
+    setTimeout(function(){
+      cachef(fpath,func);
+    },settings.cacheSpan);
+  }else{
+    cachef(fpath,func);
+  }
+}
+//cache原始图或抽点图,tbn_len=0:原始图, tbn_len>0 抽点图 
+function cachef(fpath,func) {
   //非抽点图
   if(fs.existsSync(fpath)) {
     let data = fs.readFileSync(fpath);
@@ -155,6 +172,7 @@ function cachePath(fpath,cb){
   let func = function(pos){
     pos++;
     if(pos>=ls.length){
+      console.log('path cached:'+fpath);
       if(cb){
         cb();
       }
@@ -162,9 +180,9 @@ function cachePath(fpath,cb){
     }
      let fn = fpath+ path.sep + path_tbn + ls[pos];
      console.log('cache file '+(pos+1)+'/'+len+':'+fn);
-     setTimeout(function(){
-        cacheFile(fn,func(pos));
-     },200);     
+     cacheFile(fn,function(){
+       func(pos);
+     });
   }
   func(-1);
   //cacheFile(fn,func(0));
@@ -222,6 +240,11 @@ async.auto({
                 pollInterval: 100
             }
         }
+        //for mac
+        if(path.sep=='/'){
+            cfg.usePolling=true;
+        }
+        
         var watcher = chokidar.watch(['**/*.jpg','**/*.png'],cfg);   
         watcher
         .on('add', fp => {

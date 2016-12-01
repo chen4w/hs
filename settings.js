@@ -14,7 +14,8 @@ class Setting {
     this.pic_archive = 'archive';   //归档目录
     this.pic_wallpaper = 'wallpaper'; //墙纸目录
     this.cron_archive = '0 1 * * *'; //归档检查周期,每天凌晨1点,服务启动时会立即检查
-    this.stabilityThreshold=0; //文件监测延时,ms
+    this.stabilityThreshold=1000; //文件监测延时,ms
+    this.cacheSpan = 200;//缓存延时,避免cpu阻塞
     //图片根目录
       if(path.sep=='/')
         this.pic_root = "/Users/c4w/git/pics";
