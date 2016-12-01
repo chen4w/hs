@@ -144,11 +144,19 @@ function cachePath(fpath){
       else
         return false;
   });
-  ls.forEach(function (item, index, array) {
-    let fn = fpath+ path.sep + path_tbn + item;
-    cacheFile(fn);
-  });
-  console.log('cached '+ls.length+' pics from:'+ fpath);
+  //改用异步方式,避免开始大量图片抽点造成机器僵死
+  let pos =0;
+  console.log('cache '+ls.length+' pics from:'+ fpath);
+  let fn = fpath+ path.sep + path_tbn + ls[pos];
+  let func = function(pos){
+    pos++;
+    if(pos>=ls.length)
+        return;
+     let fn = fpath+ path.sep + path_tbn + ls[pos];
+     console.log('cache file:'+fn);
+     cacheFile(fn,func(pos));
+  }
+  cacheFile(fn,func(0));
 }
 
 function getTbPath(fp){
@@ -192,15 +200,18 @@ async.auto({
         var io = scope.network.io;
 
         var chokidar = require('chokidar');
-        var watcher = chokidar.watch(['**/*.jpg','**/*.png'],{
+        var cfg = {
             ignored: /[\/\\]\./,
             cwd:settings.pic_root,
-            ignoreInitial: true,
-            awaitWriteFinish: {
+            ignoreInitial: true
+        };
+        if(settings.stabilityThreshold){
+            cfg.awaitWriteFinish={
                 stabilityThreshold: settings.stabilityThreshold,
                 pollInterval: 100
             }
-        });   
+        }
+        var watcher = chokidar.watch(['**/*.jpg','**/*.png'],cfg);   
         watcher
         .on('add', fp => {
             onEvent(fp,io,true);

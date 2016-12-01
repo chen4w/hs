@@ -14,12 +14,12 @@ class Setting {
     this.pic_archive = 'archive';   //归档目录
     this.pic_wallpaper = 'wallpaper'; //墙纸目录
     this.cron_archive = '0 1 * * *'; //归档检查周期,每天凌晨1点,服务启动时会立即检查
-    this.stabilityThreshold=2000; //文件监测延时,ms
+    this.stabilityThreshold=0; //文件监测延时,ms
     //图片根目录
       if(path.sep=='/')
         this.pic_root = "/Users/c4w/git/pics";
       else
-        this.pic_root = "c:\\pics";
+        this.pic_root = "d:\\bhere\\pics";
     //calc md5 of sn
     //this.sn_md5 = '81949faebfe3c5ff42bcbd5c06a06511';
     this.sn_md5 = crypto.createHash('md5').update(this.sn).digest("hex");
