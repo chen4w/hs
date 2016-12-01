@@ -119,13 +119,13 @@ function cacheFile(fpath,func) {
         //cache thumbnail
         fsCache.set(fpath,buf);
         if(func)
-          func(buf);
+          func();
     });
   }
 }
 
 //缓存目录下所有图片,预先生成抽点
-function cachePath(fpath){
+function cachePath(fpath,cb){
     //目录是否存在
  try {
     fs.accessSync(fpath, fs.F_OK);
@@ -154,11 +154,17 @@ function cachePath(fpath){
   //let fn = fpath+ path.sep + path_tbn + ls[pos];
   let func = function(pos){
     pos++;
-    if(pos>=ls.length)
-        return;
+    if(pos>=ls.length){
+      if(cb){
+        cb();
+      }
+      return;
+    }
      let fn = fpath+ path.sep + path_tbn + ls[pos];
      console.log('cache file '+(pos+1)+'/'+len+':'+fn);
-     cacheFile(fn,func(pos));
+     setTimeout(function(){
+        cacheFile(fn,func(pos));
+     },200);     
   }
   func(-1);
   //cacheFile(fn,func(0));
@@ -302,8 +308,9 @@ async.auto({
         archive(function(){
             //cache pic files
             console.log('---cache path-----');
-            cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'p');
-            cachePath(settings.pic_root+ path.sep + settings.pic_wallpaper);
+            cachePath(settings.pic_root+ path.sep + settings.pic_upload + path.sep +'p',function(){
+                cachePath(settings.pic_root+ path.sep + settings.pic_wallpaper);
+            });
             archiveTask();
         });
         //启动周期性归档任务
