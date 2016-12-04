@@ -6,7 +6,7 @@ class Setting {
 /**-------必须修改的配置---------------------**/
   //是否采用后台检查模式,
   //如果采用,大屏展示和归档处理目标是：upload/p目录,否则直接处理upload目录
-  this.bCheck = true; 
+  this.bCheck = false; 
     //图片根目录
    if(path.sep=='/')
       this.pic_root = "/Users/c4w/git/pics";

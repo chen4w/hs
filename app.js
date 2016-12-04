@@ -51,14 +51,33 @@ function archive(func){
         //根据是否检查,归档不同目录
         if(settings.bCheck)
             path_src=path.join(path_src,'p');
-        mv(path_src,path_yesterday, {mkdirp: true}, function(err) {
-            if(!err){ 
-                //无须告警
-                console.log('move pics from:'+path_src+' to:'+path_yesterday);
+        //检查源路径是否存在,
+        fs.access(path_src, fs.F_OK, function(err) {
+            if (err) {
+                console.log('folder to be archived:'+ path_src+' missed.');
+                return func();
+            } 
+            //没有图片,不需要归档
+            let l = fs.readdirSync(path_src).filter(function(file) {
+                return fs.statSync(path.join(path_src, file)).isFile();
+            });
+            if(l.length==0){
+                console.log('folder to be archived:'+ path_yesterday+' is empty.');
+                return func();
             }
-            func();
-            //未通过的不用归档,避免share到公网
-        });            
+            mv(path_src,path_yesterday, {mkdirp: true}, function(err) {
+                if(!err){ 
+                    console.log('move pics from:'+path_src+' to:'+path_yesterday);
+                }
+                func();
+                //如果直接移走upload目录，需要建立一个upload
+               if(!settings.bCheck){
+                   if (!fs.existsSync(path_src)){
+                        fs.mkdirSync(path_src);
+                    }
+                }
+            });            
+        });
     });
 }
 
