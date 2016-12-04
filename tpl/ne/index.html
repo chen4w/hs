@@ -37,9 +37,11 @@
 //两次动画之间停留时间,默认5s
   var span_stay = 6000;
   var span_ani = 225;
-  var path_wallpaper='/wallpaper';
-  var path_upload='/upload/p';
-  var uri_pics = '/pics';
+
+//cfg
+  var path_wallpaper;
+  var path_upload;
+  var uri_pics;
    
   var b_ss, timer_ss, timer_play;
   var pp1;
@@ -124,8 +126,16 @@ function nextFrame(p1){
 
 
     var socket = io.connect(location.host);
-    //订阅图片目录
+    //请求后台配置
     socket.on('connect', function(data) {
+      socket.emit('cfg');
+    });
+     //根据配置订阅图片目录
+   socket.on('cfg', function(settings) {
+      //console.log(data);
+      path_wallpaper='/'+settings.pic_wallpaper;
+      uri_pics = settings.uri_pics;
+      path_upload = settings.bCheck ? '/'+settings.pic_upload+'/p':'/'+settings.pic_upload;
       socket.emit('join', [path_wallpaper,path_upload]);
     });
     socket.on('added', function(data) {

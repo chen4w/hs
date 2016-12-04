@@ -48,7 +48,10 @@ function archive(func){
         let path_src = path.join(
             settings.pic_root,
             settings.pic_upload);
-        mv(path.join(path_src,'p'),path_yesterday, {mkdirp: true}, function(err) {
+        //根据是否检查,归档不同目录
+        if(settings.bCheck)
+            path_src=path.join(path_src,'p');
+        mv(path_src,path_yesterday, {mkdirp: true}, function(err) {
             if(!err){ 
                 //无须告警
                 console.log('move pics from:'+path_src+' to:'+path_yesterday);
@@ -271,6 +274,10 @@ async.auto({
         
         io.on('connection', function(client) {  
             console.log('Client ['+client.handshake.address+'] connected.');
+            //推送cfg
+            client.on('cfg', function() {
+                client.emit('cfg',settings);
+            });
             //接受订阅消息,发送初始图片集合
             client.on('join', function(sps) {
                 var fs = this.server.fs;

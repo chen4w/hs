@@ -1,7 +1,7 @@
 var sno = 1000;
 var pics_cache=[];
-//var bShowSize =true;
-var bShowSize =false;
+var bShowSize =true;
+//bShowSize =false;
 makeRemarkBox=function(boxes){
   //当前屏幕墙是否存在size22的特殊说明图
   var box_remark = $('#container').find('.box.size22');
@@ -9,7 +9,7 @@ makeRemarkBox=function(boxes){
   if(!box_remark.length){
      var box = document.createElement('div');
      box.className = 'box size22'; 
-     box.style="padding:0px;background:none;line-height:30px;";
+     box.style="padding:50px;background:none;line-height:30px;";
      var p = document.createElement('p');
      p.innerHTML="<h1>认领您的作品，<br/>去 www.bhere.cn</h1>";
      box.appendChild(p);
