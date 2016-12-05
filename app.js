@@ -190,8 +190,12 @@ function cachePath(fpath,cb){
   let pos =0;
   let len = ls.length;
   console.log('cache '+ls.length+' pics from:'+ fpath);
-  if(len==0)
+  if(len==0){
+    if(cb){
+        cb();
+    }
     return;
+  }
 
   //let fn = fpath+ path.sep + path_tbn + ls[pos];
   let func = function(pos){
