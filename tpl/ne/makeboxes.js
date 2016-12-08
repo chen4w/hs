@@ -1,7 +1,7 @@
 var sno = 1000;
 var pics_cache=[];
 var bShowSize =true;
-//bShowSize =false;
+bShowSize =false;
 makeRemarkBox=function(boxes){
   //当前屏幕墙是否存在size22的特殊说明图
   var box_remark = $('#container').find('.box.size22');
