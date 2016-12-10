@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>LED－BHere</title>
+<script src="/socket.io/socket.io.js"></script>            
+</head>
+<body bgcolor="black" style="overflow:hidden;margin:0px;padding:0px;">
+
+<script type="text/javascript" >
+   var cfg_span = 5000; //定时间隔
+   var cfg_tn64 = false;
+   //var cfg_tn64 = true;
+
+   var w=window.innerWidth|| document.documentElement.clientWidth|| document.body.clientWidth;
+   var ph = 128;
+   var pw = 64;
+   var cw = Math.floor(w / pw); //按宽度算出图片张数
+   var pd = Math.floor(w /cw) - pw;//图片间隔
+
+   //创建img占位
+   var pimgs=[];
+   var img_pos = 0;
+   for(var i=0; i<cw; i++){
+     var img = document.createElement('img');
+     img.src =  'black.jpg';
+     img.style='margin: 0px '+pd+'px 0px 0px; width:'+pw+'px;';
+     pimgs[i] = img;
+     document.body.appendChild(img);
+   }
+
+   var pics =[];
+   var pic_pos = 0;
+   var tm_frame=null;
+   //每次定时轮换图片cw张,新加入的图片排队
+   function showpic(){
+     if(tm_frame){
+       clearTimeout(tm_frame);
+       tm_frame= null;
+     }
+     //图片不足
+     if(pics.length>0){
+      for(var i=0; i<cw; i++){
+        var pic = pics[pic_pos];
+        pimgs[i].src = pic.furl;
+        pic_pos++;
+        if(pic_pos>=pics.length)
+          pic_pos=0;
+      }
+     }
+     tm_frame = setTimeout(function(){
+        showpic();
+      },cfg_span);
+   }
+
+    var socket = io.connect(location.host);
+    //请求后台配置
+    socket.on('connect', function(data) {
+      socket.emit('cfg');
+    });
+     //根据配置订阅图片目录
+   socket.on('cfg', function(settings) {
+      //console.log(data);
+      path_wallpaper='/'+settings.pic_wallpaper;
+      uri_pics = settings.uri_pics;
+      path_upload = settings.bCheck ? '/'+settings.pic_upload+'/p':'/'+settings.pic_upload;
+      socket.emit('join', [path_wallpaper,path_upload]);
+      showpic();
+    });
+    socket.on('added', function(data) {
+      //console.log('added:'+data);
+      //var pics_add=[];
+      for(var i=0; i<data.length; i++){
+        var furl = data[i].furl;
+        if(furl.indexOf(uri_pics+path_wallpaper)==0 
+        || furl.indexOf(uri_pics+path_upload)==0){
+          //抽点400改为抽点64
+          if(cfg_tn64){
+            data[i].furl = data[i].furl.replace('tbnails450','tbnails64');
+          }
+          pics.push(data[i]);
+        }else{
+          console.log(furl);
+        }
+      }
+      //if(pics_add.length==0)
+      //  return false;
+      //pics.concat(pics_add);
+      showpic();
+    });
+			  
+</script>
+
+</script>  
+</body>
+</html>    

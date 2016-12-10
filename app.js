@@ -153,7 +153,7 @@ function cachef(fpath,func) {
           if(func){
             func(null);
           }
-          return next(err);
+          //return next(err);
         } 
         //cache thumbnail
         fsCache.set(fpath,buf);
