@@ -315,8 +315,8 @@ async.auto({
                     }
                     var files=fs.readdirSync(startPath);
                 
-                    for(var i=0;i<files.length;i++){
-                        var f=files[i];
+                    for(var j=0;j<files.length;j++){
+                        var f=files[j];
                         var fext = path.extname(f);
                         if(fext=== ".jpg" || fext === ".png"  || fext === ".jpeg") {
                             //发送抽点图
