@@ -311,7 +311,7 @@ async.auto({
                     var startPath=settings.pic_root+sp.replace(/\//g,path.sep);                                   
                     if (!fs.existsSync(startPath)){
                         console.log("no dir ",startPath);
-                        return;
+                        continue;
                     }
                     var files=fs.readdirSync(startPath);
                 
