@@ -14,7 +14,7 @@ class Setting {
       this.pic_root = "d:\\bhere\\pics";
     
 /**-------可以默认的配置---------------------**/
-    this.version='2016.12';
+    this.version='2016.12.13';
     //必须是唯一的名称,将其hash值作为云端唯一标识
     this.sn = '杭州工艺美术博物馆';
     
