@@ -1,5 +1,5 @@
 # HS
-BHere的现场大屏展示,采用gaze监视文件目录，采用express作为静态文件服务
+BHere的现场大屏展示,采用chokidar监视文件目录，采用express作为静态文件服务
 
 Running the app
 -----------------------------------
